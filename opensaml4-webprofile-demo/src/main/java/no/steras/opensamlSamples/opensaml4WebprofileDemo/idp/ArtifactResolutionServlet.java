@@ -1,15 +1,12 @@
 package no.steras.opensamlSamples.opensaml4WebprofileDemo.idp;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import net.shibboleth.utilities.java.support.xml.BasicParserPool;
+import no.steras.opensamlSamples.opensaml4WebprofileDemo.OpenSAMLUtils;
+import no.steras.opensamlSamples.opensaml4WebprofileDemo.sp.SPConstants;
+import no.steras.opensamlSamples.opensaml4WebprofileDemo.sp.SPCredentials;
 import org.apache.xml.security.utils.EncryptionConstants;
+import org.joda.time.DateTime;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.schema.XSString;
@@ -19,27 +16,7 @@ import org.opensaml.messaging.decoder.MessageDecodingException;
 import org.opensaml.messaging.encoder.MessageEncodingException;
 import org.opensaml.saml.saml2.binding.decoding.impl.HTTPSOAP11Decoder;
 import org.opensaml.saml.saml2.binding.encoding.impl.HTTPSOAP11Encoder;
-import org.opensaml.saml.saml2.core.ArtifactResponse;
-import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.Attribute;
-import org.opensaml.saml.saml2.core.AttributeStatement;
-import org.opensaml.saml.saml2.core.AttributeValue;
-import org.opensaml.saml.saml2.core.Audience;
-import org.opensaml.saml.saml2.core.AudienceRestriction;
-import org.opensaml.saml.saml2.core.AuthnContext;
-import org.opensaml.saml.saml2.core.AuthnContextClassRef;
-import org.opensaml.saml.saml2.core.AuthnStatement;
-import org.opensaml.saml.saml2.core.Conditions;
-import org.opensaml.saml.saml2.core.EncryptedAssertion;
-import org.opensaml.saml.saml2.core.Issuer;
-import org.opensaml.saml.saml2.core.NameID;
-import org.opensaml.saml.saml2.core.NameIDType;
-import org.opensaml.saml.saml2.core.Response;
-import org.opensaml.saml.saml2.core.Status;
-import org.opensaml.saml.saml2.core.StatusCode;
-import org.opensaml.saml.saml2.core.Subject;
-import org.opensaml.saml.saml2.core.SubjectConfirmation;
-import org.opensaml.saml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.encryption.Encrypter;
 import org.opensaml.xmlsec.encryption.support.DataEncryptionParameters;
 import org.opensaml.xmlsec.encryption.support.EncryptionException;
@@ -51,11 +28,13 @@ import org.opensaml.xmlsec.signature.support.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import net.shibboleth.utilities.java.support.xml.BasicParserPool;
-import no.steras.opensamlSamples.opensaml4WebprofileDemo.OpenSAMLUtils;
-import no.steras.opensamlSamples.opensaml4WebprofileDemo.sp.SPConstants;
-import no.steras.opensamlSamples.opensaml4WebprofileDemo.sp.SPCredentials;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class ArtifactResolutionServlet extends HttpServlet {
 	private static Logger logger = LoggerFactory.getLogger(ArtifactResolutionServlet.class);
@@ -107,7 +86,8 @@ public class ArtifactResolutionServlet extends HttpServlet {
 		Issuer issuer = OpenSAMLUtils.buildSAMLObject(Issuer.class);
 		issuer.setValue(IDPConstants.IDP_ENTITY_ID);
 		artifactResponse.setIssuer(issuer);
-		artifactResponse.setIssueInstant(Instant.now());
+		//artifactResponse.setIssueInstant(Instant.now());
+		artifactResponse.setIssueInstant(DateTime.now());
 		artifactResponse.setDestination(SPConstants.ASSERTION_CONSUMER_SERVICE);
 
 		artifactResponse.setID(OpenSAMLUtils.generateSecureRandomId());
@@ -120,7 +100,8 @@ public class ArtifactResolutionServlet extends HttpServlet {
 
 		Response response = OpenSAMLUtils.buildSAMLObject(Response.class);
 		response.setDestination(SPConstants.ASSERTION_CONSUMER_SERVICE);
-		response.setIssueInstant(Instant.now());
+		//response.setIssueInstant(Instant.now());
+		response.setIssueInstant(DateTime.now());
 		response.setID(OpenSAMLUtils.generateSecureRandomId());
 		Issuer issuer2 = OpenSAMLUtils.buildSAMLObject(Issuer.class);
 		issuer2.setValue(IDPConstants.IDP_ENTITY_ID);
@@ -192,7 +173,8 @@ public class ArtifactResolutionServlet extends HttpServlet {
 		Issuer issuer = OpenSAMLUtils.buildSAMLObject(Issuer.class);
 		issuer.setValue(IDPConstants.IDP_ENTITY_ID);
 		assertion.setIssuer(issuer);
-		assertion.setIssueInstant(Instant.now());
+		//assertion.setIssueInstant(Instant.now());
+		assertion.setIssueInstant(DateTime.now());
 
 		assertion.setID(OpenSAMLUtils.generateSecureRandomId());
 
@@ -224,8 +206,10 @@ public class ArtifactResolutionServlet extends HttpServlet {
 
 		SubjectConfirmationData subjectConfirmationData = OpenSAMLUtils.buildSAMLObject(SubjectConfirmationData.class);
 		subjectConfirmationData.setInResponseTo("Made up ID");
-		subjectConfirmationData.setNotBefore(Instant.now());
-		subjectConfirmationData.setNotOnOrAfter(Instant.now().plus(10, ChronoUnit.MINUTES));
+		//subjectConfirmationData.setNotBefore(Instant.now());
+		subjectConfirmationData.setNotBefore(DateTime.now());
+		//subjectConfirmationData.setNotOnOrAfter(Instant.now().plus(10, ChronoUnit.MINUTES));
+        subjectConfirmationData.setNotOnOrAfter(DateTime.now().plusMinutes(10));
 		subjectConfirmationData.setRecipient(SPConstants.ASSERTION_CONSUMER_SERVICE);
 
 		subjectConfirmation.setSubjectConfirmationData(subjectConfirmationData);
@@ -237,22 +221,24 @@ public class ArtifactResolutionServlet extends HttpServlet {
 		AuthnStatement authnStatement = OpenSAMLUtils.buildSAMLObject(AuthnStatement.class);
 		AuthnContext authnContext = OpenSAMLUtils.buildSAMLObject(AuthnContext.class);
 		AuthnContextClassRef authnContextClassRef = OpenSAMLUtils.buildSAMLObject(AuthnContextClassRef.class);
-		authnContextClassRef.setURI(AuthnContext.SMARTCARD_AUTHN_CTX);
+		//authnContextClassRef.setURI(AuthnContext.SMARTCARD_AUTHN_CTX);
+		authnContextClassRef.setAuthnContextClassRef(AuthnContext.SMARTCARD_AUTHN_CTX);
 		authnContext.setAuthnContextClassRef(authnContextClassRef);
 		authnStatement.setAuthnContext(authnContext);
 
-		authnStatement.setAuthnInstant(Instant.now());
+		authnStatement.setAuthnInstant(DateTime.now());
 
 		return authnStatement;
 	}
 
 	private Conditions buildConditions() {
 		Conditions conditions = OpenSAMLUtils.buildSAMLObject(Conditions.class);
-		conditions.setNotBefore(Instant.now());
-		conditions.setNotOnOrAfter(Instant.now().plus(10, ChronoUnit.MINUTES));
+		conditions.setNotBefore(DateTime.now());
+		conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
 		AudienceRestriction audienceRestriction = OpenSAMLUtils.buildSAMLObject(AudienceRestriction.class);
 		Audience audience = OpenSAMLUtils.buildSAMLObject(Audience.class);
-		audience.setURI(SPConstants.ASSERTION_CONSUMER_SERVICE);
+		//audience.setURI(SPConstants.ASSERTION_CONSUMER_SERVICE);
+		audience.setAudienceURI(SPConstants.ASSERTION_CONSUMER_SERVICE);
 		audienceRestriction.getAudiences().add(audience);
 		conditions.getAudienceRestrictions().add(audienceRestriction);
 		return conditions;

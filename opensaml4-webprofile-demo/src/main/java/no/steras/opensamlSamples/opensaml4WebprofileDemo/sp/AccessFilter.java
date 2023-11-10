@@ -16,6 +16,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.joda.time.DateTime;
 import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
@@ -38,7 +39,7 @@ import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 import org.opensaml.saml.saml2.metadata.Endpoint;
 import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 import org.opensaml.xmlsec.SignatureSigningParameters;
-import org.opensaml.xmlsec.config.impl.JavaCryptoValidationInitializer;
+import org.opensaml.xmlsec.config.JavaCryptoValidationInitializer;
 import org.opensaml.xmlsec.context.SecurityParametersContext;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.slf4j.Logger;
@@ -176,7 +177,7 @@ public class AccessFilter implements Filter {
 
 	private AuthnRequest buildAuthnRequest() {
 		AuthnRequest authnRequest = OpenSAMLUtils.buildSAMLObject(AuthnRequest.class);
-		authnRequest.setIssueInstant(Instant.now());
+		authnRequest.setIssueInstant(DateTime.now());
 		authnRequest.setDestination(getIPDSSODestination());
 		authnRequest.setProtocolBinding(SAMLConstants.SAML2_ARTIFACT_BINDING_URI);
 		authnRequest.setAssertionConsumerServiceURL(getAssertionConsumerEndpoint());
@@ -193,7 +194,8 @@ public class AccessFilter implements Filter {
 		requestedAuthnContext.setComparison(AuthnContextComparisonTypeEnumeration.MINIMUM);
 
 		AuthnContextClassRef passwordAuthnContextClassRef = OpenSAMLUtils.buildSAMLObject(AuthnContextClassRef.class);
-		passwordAuthnContextClassRef.setURI(AuthnContext.PASSWORD_AUTHN_CTX);
+		// in newer version: passwordAuthnContextClassRef.setURI(AuthnContext.PASSWORD_AUTHN_CTX);
+		passwordAuthnContextClassRef.setAuthnContextClassRef(AuthnContext.PASSWORD_AUTHN_CTX);
 
 		requestedAuthnContext.getAuthnContextClassRefs().add(passwordAuthnContextClassRef);
 

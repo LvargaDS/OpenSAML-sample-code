@@ -2,6 +2,7 @@ package no.steras.opensamlSamples.opensaml4WebprofileDemo;
 
 import javax.xml.namespace.QName;
 
+import net.shibboleth.utilities.java.support.security.RandomIdentifierGenerationStrategy;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import net.shibboleth.utilities.java.support.security.impl.RandomIdentifierGenerationStrategy;
 import net.shibboleth.utilities.java.support.xml.SerializeSupport;
 
 /**

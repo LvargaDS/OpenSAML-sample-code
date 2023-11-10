@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.messaging.context.InOutOperationContext;
@@ -104,8 +105,10 @@ public class ConsumerServlet extends HttpServlet {
 		messageInfoContext.setMessageIssueInstant(artifactResponse.getIssueInstant());
 
 		MessageLifetimeSecurityHandler lifetimeSecurityHandler = new MessageLifetimeSecurityHandler();
-		lifetimeSecurityHandler.setClockSkew(Duration.ofMillis(1000));
-		lifetimeSecurityHandler.setMessageLifetime(Duration.ofMillis(2000));
+		//lifetimeSecurityHandler.setClockSkew(Duration.ofMillis(1000));
+		//lifetimeSecurityHandler.setMessageLifetime(Duration.ofMillis(2000));
+		lifetimeSecurityHandler.setClockSkew(3000);
+		lifetimeSecurityHandler.setMessageLifetime(16000);
 		lifetimeSecurityHandler.setRequiredRule(true);
 
 		ReceivedEndpointSecurityHandler receivedEndpointSecurityHandler = new ReceivedEndpointSecurityHandler();
@@ -177,7 +180,7 @@ public class ConsumerServlet extends HttpServlet {
 
 	private void logAuthenticationMethod(Assertion assertion) {
 		logger.info("Authentication method: "
-				+ assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getURI());
+				+ assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef());
 	}
 
 	private void logAuthenticationInstant(Assertion assertion) {
@@ -253,7 +256,7 @@ public class ConsumerServlet extends HttpServlet {
 
 	private Artifact buildArtifactFromRequest(final HttpServletRequest req) {
 		Artifact artifact = OpenSAMLUtils.buildSAMLObject(Artifact.class);
-		artifact.setValue(req.getParameter("SAMLart"));
+		artifact.setArtifact(req.getParameter("SAMLart"));
 		return artifact;
 	}
 
@@ -264,7 +267,8 @@ public class ConsumerServlet extends HttpServlet {
 		issuer.setValue(SPConstants.SP_ENTITY_ID);
 		artifactResolve.setIssuer(issuer);
 
-		artifactResolve.setIssueInstant(Instant.now());
+		//artifactResolve.setIssueInstant(Instant.now());
+		artifactResolve.setIssueInstant(DateTime.now());
 
 		artifactResolve.setID(OpenSAMLUtils.generateSecureRandomId());
 
